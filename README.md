@@ -1,2 +1,1 @@
-# propuesta
-mi propuesta
+
