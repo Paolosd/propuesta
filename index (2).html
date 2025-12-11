@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta Karaoke — Michelle</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg,#071028 0%,#081228 60%);
+  color: #e6eef8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  text-align: center;
+}
+
+.card {
+  width: 90%;
+  max-width: 900px;
+  background: rgba(15,23,36,0.5);
+  border-radius: 14px;
+  padding: 20px 30px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+  position: relative;
+  z-index: 2;
+}
+
+.photo-container {
+  margin-bottom: 20px;
+  position: relative;
+  height: 300px;
+}
+
+.photo-container img {
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  position: absolute;
+  top: 0; left: 0; right:0; bottom:0;
+  margin:auto;
+}
+
+.karaoke {
+  height: 60px;
+}
+
+.karaoke .line {
+  font-size: 24px;
+  margin: 0;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  transition: opacity 0.5s;
+}
+
+.karaoke .line.active {
+  opacity: 1;
+}
+
+.big-question {
+  font-size: 36px;
+  color: #ff6b81;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+.audio-control {
+  margin-top: 15px;
+}
+
+.heart {
+  position: absolute;
+  width: 20px; height: 20px;
+  background: red;
+  transform: rotate(-45deg);
+  animation: rise 6s linear infinite;
+  z-index:3; /* por encima de todo */
+}
+.heart::before, .heart::after {
+  content:'';
+  position:absolute;
+  width:20px; height:20px;
+  background:red;
+  border-radius:50%;
+}
+.heart::before { top:-10px; left:0; }
+.heart::after { left:10px; top:0; }
+@keyframes rise {
+  0% {top:100%; opacity:1;}
+  100% {top:-10%; opacity:0;}
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="photo-container" id="photo-container">
+    <img id="photo" src="foto1.jpg" alt="Foto">
+  </div>
+  <div class="karaoke" id="karaoke"></div>
+  <div class="big-question" id="big-question"></div>
+  <audio id="music" class="audio-control" src="cancion.mp3" controls></audio>
+</div>
+
+<script>
+const lyrics = [
+  "Hola Michelle",
+  "Sé que he tardado un poquito, pero quería hacer algo bonito para ti.",
+  "En todo este tiempo han pasado muchas cosas,",
+  "y aun así, cada momento a tu lado ha sido especial.",
+  "Como siempre te digo, esta conexión que tenemos es increíble,",
+  "y espero que siga así… y que mejore aún más.",
+  "Te has convertido en una persona esencial en mi vida.",
+  "Haberte conocido fue de las mejores cosas que me han pasado.",
+  "Quiero que sepas que eres increíble, alegre, cariñosa y todas esas cositas que te hacen única para mí.",
+  "Y sí, quería ser original (no copia) como tú dices…",
+  "Por eso me tomé el tiempo para que este momento sea especial.",
+  "Desde el primer momento ya sabía que mis intenciones contigo serían las mejores.",
+  "Pero hoy quiero decirlo sin filtros",
+  "Encontré al amor de mi vida sin buscarlo,",
+  "y eso es lo más loco,",
+  "porque llegaste tú, así de la nada,",
+  "eres exactamente lo que yo necesitaba.",
+  "Desde que entraste en mi vida",
+  "todo tuvo un brillo diferente,",
+  "como si el universo me hubiera dicho 'Aquí está, aquí está lo que tanto esperabas'.",
+  "Cada día contigo me confirma algo",
+  "Eres la persona con la que quiero quedarme toda la vida.",
+  "Todo el cariño que tengo para darte es inmenso",
+  "me nace ser así contigo",
+  "quiero ser la última persona que veas con ilusión y con amor,",
+  "comprendo el lenguaje del amor,",
+  "Te veo y haces sentir que me amas de verdad,",
+  "Y si quiero eso para mi futuro."
+];
+
+const photos = ["foto1.jpg","foto2.jpg","foto3.jpg","foto4.jpg","foto5.jpg","foto6.jpg","foto7.jpg"];
+let currentPhoto = 0;
+
+const karaoke = document.getElementById('karaoke');
+const bigQuestion = document.getElementById('big-question');
+const photoEl = document.getElementById('photo');
+
+lyrics.forEach((line, idx)=>{
+  const div = document.createElement('div');
+  div.className = 'line';
+  div.id = 'line-'+idx;
+  div.innerHTML = line.split(' ').map(word=>`<span class="word">${word}&nbsp;</span>`).join('');
+  karaoke.appendChild(div);
+});
+
+let currentIdx = -1;
+let startTime = Date.now()/1000;
+
+setInterval(()=>{
+  currentPhoto = (currentPhoto+1)%photos.length;
+  photoEl.src = photos[currentPhoto];
+},30000);
+
+function tick(){
+  const t = Date.now()/1000 - startTime;
+  let idx = Math.floor(t/7); // índice de la línea actual
+  if(idx !== currentIdx){
+    if(currentIdx>=0 && currentIdx<lyrics.length){
+      document.getElementById('line-'+currentIdx).classList.remove('active');
+    }
+    currentIdx = idx;
+    if(idx < lyrics.length){
+      const el = document.getElementById('line-'+idx);
+      el.classList.add('active');
+      setTimeout(()=>{ el.classList.remove('active'); }, 4000);
+    } else {
+      // mostrar pregunta final
+      bigQuestion.textContent = 'Michelle, ¿quieres ser mi enamorada? 💖';
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+tick();
+
+// corazones flotantes
+for(let i=0;i<30;i++){
+  const heart=document.createElement('div');
+  heart.className='heart';
+  heart.style.left=Math.random()*100+'%';
+  heart.style.animationDuration=(4+Math.random()*4)+'s';
+  document.body.appendChild(heart);
+}
+</script>
+
+</body>
+</html>
+
+
+
+
+
